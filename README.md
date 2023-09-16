@@ -1,1 +1,1 @@
-simple open source projects
+Simple projects =)
