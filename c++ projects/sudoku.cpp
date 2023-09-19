@@ -2,8 +2,6 @@
 #include <iostream>
 #include <random>
 
-#define PRINT_INFO(variable_name, result) std::cout << variable_name << " : " << result << std::endl;
-
 enum Color {
       BlackFg = 90,
       BlackBg = 40,
@@ -21,63 +19,64 @@ enum Color {
 };
 
 void game();
-
-int **mtrxAllocate(int dimension);
-void freeMtrxs(int ***defaultDigits, int ***currentDigits, int ***solvedMtrx, int dimension);
-void freeMtrx(int ***mtrxPtr, int len);
-
-Color getFgColor(int **digits, int **defaultDigits, int dimension, int row, int col, int playerPosX,
-                 int playerPosY);
-
-void initDigits(int ***defaultDigitsPtr, int ***solvedDigitsPtr, int ***currentDigitsPtr, int dimension);
-void fillMtrxOfRandomDigitsFully(int ***mtrxPtr, int dimension);
-int getRandomUnusedDigit(int ***mtrxPtr, int dimension, int verticalIndex, int horizontalIndex);
-bool hasDigitInHorizontalLine(int **mtrx, int dimension, int verticalIndex, int horizontalIndex, int digit);
-bool hasDigitInVerticalLine(int **mtrx, int dimension, int verticalIndex, int horizontalIndex, int digit);
-bool hasDigitInCurrentSection(int **mtrx, int digit, int horizontalIndex, int verticalIndex);
-
-void hideAnyRandomDigits(int ***digitsPtr);
-void hideDigitsInThisSection(int ***digitPtr, int amountOfHiddenDigits, int startRow, int startCol);
-
-void copyMtrx(int **from, int ***to, int dimension);
-
-void wipeOfLine(int ***digitsPtr, int dimension, int indexOfLine);
-
-void drawField(int **digits, int **defaultDigits, int digitsDimension, int playerPosX, int playerPosY);
-
+void initDigits(int ***defaultDigitsPtr, int ***solvedDigitsPtr, int ***currentDigitsPtr,
+                const int dimension);
 void doActionWithPlayerInput(char *playerInput, int *playerPosX, int *playerPosY, int ***currentDigits,
-                             int ***defaultDigits, int ***solvedMtrx, int digitsDimension,
-                             int *digitsShownCount, bool *isMenuShown);
+                             int ***defaultDigits, int ***solvedMtrx, int dimension, int *digitsShownCount,
+                             bool *isMenuShown);
+void drawField(int ***digits, int ***defaultDigits, const int dimension, const int playerPosX,
+               const int playerPosY);
 
-bool isDefaultDigit(int **currentDigits, int **defaultDigits, int row, int col);
-bool isCorrectInputedDigit(int **digits, int dimension, int row, int col);
-int getCountOfShownNumbers(int **defaultDigits, int dimension);
+void fillMtrxOfRandomDigitsFully(int ***mtrxPtr, const int dimension);
+void hideAnyRandomDigits(int ***digitsPtr);
+void hideDigitsInThisSection(int ***digitPtr, int amountOfHiddenDigits, const int startRow,
+                             const int startCol);
 
-void clear();
-void showHint(int ***solvedMtrx, int ***defaultDigits, int dimension);
-void showMenu(int digitsShownCount);
-void showRules();
-void showEndOfGame(int filledSellsCount);
-void refreshField(int ***currentDigits, int **defaultDigits, int dimension, int *playerPosX, int *playerPosY,
-                  int *digitsShownCount);
-void refreshCurrentData(int **defaultDigits, int dimension, int *playerPosX, int *playerPosY,
+void copyDigits(int ***from, int ***to, const int dimension);
+void clearLine(int ***digitsPtr, const int dimension, const int indexOfLine);
+
+void refreshField(int ***currentDigits, int ***defaultDigits, const int dimension, int *playerPosY,
+                  int *playerPosX, int *digitsShownCount);
+void refreshCurrentData(int ***defaultDigits, const int dimension, int *playerPosY, int *playerPosX,
                         int *digitsShownCount);
-void recreateDigits(int ***currentDigits, int ***defaultDigits, int ***solvedMtrx, int dimension,
-                    int *playerPosX, int *playerPosY, int *digitsShownCount);
-void clearSell(int ***currentDigits, int ***defaultDigits, int row, int col, int dimension,
+void recreateDigits(int ***currentDigits, int ***defaultDigits, int ***solvedMtrx, const int dimension,
+                    int *playerPosY, int *playerPosX, int *digitsShownCount);
+
+void clearSell(int ***currentDigits, int ***defaultDigits, const int row, const int col, const int dimension,
                int *digitsShownCount);
-void changeSell(int ***currentDigits, int ***defaultDigits, int row, int col, int dimension, char playerInput,
-                int *digitsShownCount);
+void changeSell(int ***currentDigits, int ***defaultDigits, const int row, const int col, const int dimension,
+                const char playerInput, int *digitsShownCount);
+
 template <typename T>
-void setColor(int fgColor, int bgColor, T text);
+void setColor(const int fgColor, const int bgColor, const T text);
+void clear();
+
+void showRules();
+void showMenu(const int digitsShownCount);
+void showHint(int ***solvedMtrx, int ***defaultDigits, const int dimension);
+void showEndOfGame(const int filledSellsCount);
+
+int **mtrxAllocate(const int dimension);
+void freeMtrxs(int ***defaultDigits, int ***currentDigits, int ***solvedMtrx, const int dimension);
+void freeMtrx(int ***mtrxPtr, const int dimension);
+
+Color getFgColor(int ***digits, int ***defaultDigits, const int dimension, const int row, const int col,
+                 const int playerPosX, const int playerPosY);
+
+int getRandomUnusedDigit(int ***mtrxPtr, const int dimension, const int row, const int col);
+int getCountOfShownDigits(int ***defaultDigits, const int dimension);
+
+bool hasDigitInHorizontalLine(int ***mtrx, const int dimension, const int row, const int col,
+                              const int digit);
+bool hasDigitInVerticalLine(int ***mtrx, const int dimension, const int row, const int col, const int digit);
+bool hasDigitInCurrentSection(int ***mtrx, const int digit, const int row, const int col);
+
+bool isDefaultDigit(int ***currentDigits, int ***defaultDigits, const int row, const int col);
+bool isEnteredDigitCorrect(int ***digits, const int dimension, const int row, const int col);
 
 // Tasks:
 // 1. If digit was correct and than we change the other value and this value
-// became incorrect - we need to decrease an count of shown digits
-// 2. Test the code;
-// 3. Change arrays transmission from copying to pointers;
-
-// 4. Catch 982742 input or other
+// became incorrect - we need to decrease an count of shown digits.
 
 int main() {
       srand(time(NULL));
@@ -86,7 +85,8 @@ int main() {
 
       return 0;
 }
-// checked
+
+// Allocate and free digits using one parameter for each of mtrxs.
 void game() {
       const int DIMENSION = 9;
       const int END_COUNT = 81;
@@ -99,7 +99,7 @@ void game() {
       initDigits(&defaultDigits, &solvedMtrx, &currentDigits, DIMENSION);
 
       int playerPosX = MIDDLE, playerPosY = MIDDLE;
-      int digitsShownCount = getCountOfShownNumbers(defaultDigits, DIMENSION);
+      int digitsShownCount = getCountOfShownDigits(&defaultDigits, DIMENSION);
       int initialDigitsShownCount = digitsShownCount;
 
       char playerInput;
@@ -109,7 +109,7 @@ void game() {
       showRules();
 
       do {
-            drawField(currentDigits, defaultDigits, DIMENSION, playerPosX, playerPosY);
+            drawField(&currentDigits, &defaultDigits, DIMENSION, playerPosX, playerPosY);
             if (isMenuShown)
                   showMenu(digitsShownCount);
             else
@@ -125,117 +125,24 @@ void game() {
 
       freeMtrxs(&defaultDigits, &currentDigits, &solvedMtrx, DIMENSION);
 }
-// checked
-int getCountOfShownNumbers(int **defaultDigits, int dimension) {
-      int result = 0;
 
-      for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                  result = *(*(defaultDigits + i) + j) != 0 ? result + 1 : result;
-            }
-      }
+void initDigits(int ***defaultDigitsPtr, int ***solvedDigitsPtr, int ***currentDigitsPtr,
+                const int dimension) {
+      fillMtrxOfRandomDigitsFully(solvedDigitsPtr, dimension);
 
-      return result;
-}
-// checked
-int **mtrxAllocate(int dimension) {
-      int **ptr = new int *[dimension];
+      copyDigits(solvedDigitsPtr, defaultDigitsPtr, dimension);
 
-      for (int i = 0; i < dimension; i++) *(ptr + i) = new int[dimension];
+      hideAnyRandomDigits(defaultDigitsPtr);
 
-      return ptr;
-}
-// checked
-void freeMtrxs(int ***defaultDigits, int ***currentDigits, int ***solvedMtrx, int dimension) {
-      freeMtrx(defaultDigits, dimension);
-      freeMtrx(currentDigits, dimension);
-      freeMtrx(solvedMtrx, dimension);
-}
-
-void freeMtrx(int ***mtrxPtr, int len) {
-      for (int i = 0; i < len; i++) delete[] * (*mtrxPtr + i);
-
-      delete[](*mtrxPtr);
-}
-
-void clear() { std::cout << "\x1B[2J\x1B[H"; }
-
-void drawField(int **digits, int **defaultDigits, int digitsDimension, int playerPosX, int playerPosY) {
-      using std::cout, std::endl;
-
-      const int SIDE_BORDERS_COUNT = 4;
-      const char VERTICAL_LINE = '\055', HORIZONTAL_LINE = '\174';
-      const char SPACE_BAR = '\040';
-      const char HIDDEN_CELL = '\052';
-
-      Color fgColor = Color::Default, bgColor = Color::Default;
-
-      for (int i = 0, row = 0; i < digitsDimension + SIDE_BORDERS_COUNT; i++) {
-            for (int j = 0, col = 0; j < digitsDimension + SIDE_BORDERS_COUNT; j++) {
-                  cout << SPACE_BAR;
-
-                  fgColor =
-                      getFgColor(digits, defaultDigits, digitsDimension, row, col, playerPosX, playerPosY);
-
-                  if (i % 4 == 0)
-                        setColor(Color::Default, Color::Default, VERTICAL_LINE);
-                  else if (j % 4 == 0)
-                        setColor(Color::Default, Color::Default, HORIZONTAL_LINE);
-                  else if (*(*(digits + row) + col) == 0)
-                        setColor(fgColor, bgColor, HIDDEN_CELL);
-                  else
-                        setColor(fgColor, bgColor, *(*(digits + row) + col));
-
-                  col = j % 4 != 0 ? col + 1 : col;
-            }
-
-            row = i % 4 != 0 && row + 1 != digitsDimension ? row + 1 : row;
-
-            cout << endl;
-      }
-}
-
-Color getFgColor(int **digits, int **defaultDigits, int dimension, int row, int col, int playerPosX,
-                 int playerPosY) {
-      Color result;
-
-      const int HIDDEN_DIGIT = 0;
-
-      bool isDefaultDigit = *(*(defaultDigits + row) + col) == *(*(digits + row) + col);
-      bool isShownDigit = (*(*(digits + row) + col)) != HIDDEN_DIGIT;
-
-      if (row == playerPosY && col == playerPosX)
-            result = Color::CyanFg;
-      else if (!isCorrectInputedDigit(digits, dimension, row, col) && !isDefaultDigit && isShownDigit)
-            result = Color::RedFg;
-      else if (isDefaultDigit && isShownDigit)
-            result = Color::YellowFg;
-      else if (!isDefaultDigit)
-            result = Color::GreenFg;
-      else
-            result = Color::BlackFg;
-
-      return result;
-}
-
-bool isCorrectInputedDigit(int **digits, int dimension, int row, int col) {
-      return ((!hasDigitInHorizontalLine(digits, dimension, row, col, *(*(digits + row) + col)) &&
-               !hasDigitInVerticalLine(digits, dimension, row, col, *(*(digits + row) + col))) &&
-              !hasDigitInCurrentSection(digits, *(*(digits + row) + col), col, row));
-}
-
-template <typename T>
-void setColor(int fgColor, int bgColor, T text) {
-      std::cout << "\033[" << bgColor << ";" << fgColor << "m" << text << "\033[" << Color::Default << "m";
+      copyDigits(defaultDigitsPtr, currentDigitsPtr, dimension);
 }
 
 void doActionWithPlayerInput(char *playerInput, int *playerPosX, int *playerPosY, int ***currentDigits,
-                             int ***defaultDigits, int ***solvedMtrx, int digitsDimension,
-                             int *digitsShownCount, bool *isMenuShown) {
+                             int ***defaultDigits, int ***solvedMtrx, int dimension, int *digitsShownCount,
+                             bool *isMenuShown) {
       const int INDENT_TO_CAPITAL_LETTER = 32;
 
       std::cout << "\nInput: _\b";
-      // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       std::cin >> *playerInput;
       *playerInput =
           *playerInput >= 'A' && *playerInput <= 'Z' ? *playerInput + INDENT_TO_CAPITAL_LETTER : *playerInput;
@@ -245,16 +152,16 @@ void doActionWithPlayerInput(char *playerInput, int *playerPosX, int *playerPosY
                   *playerPosY = (*playerPosY) - 1 != -1 ? (*playerPosY) - 1 : (*playerPosY);
                   break;
             case 's':
-                  *playerPosY = (*playerPosY) + 1 != digitsDimension ? (*playerPosY) + 1 : (*playerPosY);
+                  *playerPosY = (*playerPosY) + 1 != dimension ? (*playerPosY) + 1 : (*playerPosY);
                   break;
             case 'a':
                   *playerPosX = (*playerPosX) - 1 != -1 ? (*playerPosX) - 1 : (*playerPosX);
                   break;
             case 'd':
-                  *playerPosX = (*playerPosX) + 1 != digitsDimension ? (*playerPosX) + 1 : (*playerPosX);
+                  *playerPosX = (*playerPosX) + 1 != dimension ? (*playerPosX) + 1 : (*playerPosX);
                   break;
             case '0':
-                  clearSell(currentDigits, defaultDigits, *playerPosY, *playerPosX, digitsDimension,
+                  clearSell(currentDigits, defaultDigits, *playerPosY, *playerPosX, dimension,
                             digitsShownCount);
                   break;
             case '1':
@@ -266,8 +173,8 @@ void doActionWithPlayerInput(char *playerInput, int *playerPosX, int *playerPosY
             case '7':
             case '8':
             case '9':
-                  changeSell(currentDigits, defaultDigits, *playerPosY, *playerPosX, digitsDimension,
-                             *playerInput, digitsShownCount);
+                  changeSell(currentDigits, defaultDigits, *playerPosY, *playerPosX, dimension, *playerInput,
+                             digitsShownCount);
                   break;
             case 'm':
                   *isMenuShown = true;
@@ -276,69 +183,227 @@ void doActionWithPlayerInput(char *playerInput, int *playerPosX, int *playerPosY
                   *isMenuShown = false;
                   break;
             case 'r':
-                  refreshField(currentDigits, *defaultDigits, digitsDimension, playerPosX, playerPosY,
+                  refreshField(currentDigits, defaultDigits, dimension, playerPosY, playerPosX,
                                digitsShownCount);
                   break;
             case 'h':
-                  showHint(solvedMtrx, defaultDigits, digitsDimension);
+                  showHint(solvedMtrx, defaultDigits, dimension);
                   break;
             case 'n':
-                  recreateDigits(currentDigits, defaultDigits, solvedMtrx, digitsDimension, playerPosX,
-                                 playerPosY, digitsShownCount);
+                  recreateDigits(currentDigits, defaultDigits, solvedMtrx, dimension, playerPosY, playerPosX,
+                                 digitsShownCount);
                   break;
       }
 }
 
-void changeSell(int ***currentDigits, int ***defaultDigits, int row, int col, int dimension, char playerInput,
-                int *digitsShownCount) {
-      if (!isDefaultDigit(*currentDigits, *defaultDigits, row, col)) {
-            bool isHiddenSell = *(*(*currentDigits + row) + col) == 0 ? true : false;
+void drawField(int ***digits, int ***defaultDigits, const int dimension, const int playerPosX,
+               const int playerPosY) {
+      using std::cout, std::endl;
 
-            bool isPreviousDigitWasCorrect =
-                isCorrectInputedDigit(*currentDigits, dimension, row, col) && !isHiddenSell;
+      const int SIDE_BORDERS_COUNT = 4;
+      const char VERTICAL_LINE = '|', HORIZONTAL_LINE = '-';
+      const char SPACE_BAR = ' ';
+      const char HIDDEN_CELL = '*';
 
-            *(*(*currentDigits + row) + col) = playerInput - '0';
+      Color fgColor = Color::Default, bgColor = Color::Default;
 
-            bool isCurrentDigitWasCorrect = isCorrectInputedDigit(*currentDigits, dimension, row, col);
+      for (int i = 0, row = 0; i < dimension + SIDE_BORDERS_COUNT; i++) {
+            for (int j = 0, col = 0; j < dimension + SIDE_BORDERS_COUNT; j++) {
+                  cout << SPACE_BAR;
 
-            if (isCurrentDigitWasCorrect && !isPreviousDigitWasCorrect)
-                  (*digitsShownCount)++;
-            else if (isPreviousDigitWasCorrect && !isCurrentDigitWasCorrect) {
-                  (*digitsShownCount)--;
+                  fgColor = getFgColor(digits, defaultDigits, dimension, row, col, playerPosX, playerPosY);
+
+                  if (i % 4 == 0)
+                        setColor(Color::Default, Color::Default, HORIZONTAL_LINE);
+                  else if (j % 4 == 0)
+                        setColor(Color::Default, Color::Default, VERTICAL_LINE);
+                  else if (*(*(*digits + row) + col) == 0)
+                        setColor(fgColor, bgColor, HIDDEN_CELL);
+                  else
+                        setColor(fgColor, bgColor, *(*(*digits + row) + col));
+
+                  col = j % 4 != 0 ? col + 1 : col;
+            }
+
+            row = i % 4 != 0 && row + 1 != dimension ? row + 1 : row;
+
+            cout << endl;
+      }
+}
+
+void fillMtrxOfRandomDigitsFully(int ***mtrxPtr, const int dimension) {
+      int clearedLinesCount = 0;
+      int clastClearedLine = 0;
+
+      for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                  int result = getRandomUnusedDigit(mtrxPtr, dimension, i, j);
+
+                  if (result != -1) {
+                        *(*(*mtrxPtr + i) + j) = result;
+                  } else {
+                        clearLine(mtrxPtr, dimension, i);
+
+                        if (++clearedLinesCount > 1 && clastClearedLine == i) {
+                              for (int k = 0; k <= i; k++) clearLine(mtrxPtr, dimension, k);
+
+                              i = 0;
+
+                              clearedLinesCount = 0;
+                        }
+
+                        j = -1;
+
+                        clastClearedLine = i;
+                  }
             }
       }
 }
 
-void clearSell(int ***currentDigits, int ***defaultDigits, int row, int col, int dimension,
+void hideAnyRandomDigits(int ***digitsPtr) {
+      const int LEFT_GROUND = 5, RIGHT_GROUND = 7;
+      const int SECTIONS_COUNT = 9;
+      const int SECTION_LEN = 3;
+
+      for (int i = 0; i < SECTIONS_COUNT; i++) {
+            int amountOfHiddenDigits = LEFT_GROUND + rand() % (RIGHT_GROUND - LEFT_GROUND + 1);
+
+            int startIndexOfSectionRow = SECTION_LEN * (i / SECTION_LEN);
+            int startIndexOfSectionCol = SECTION_LEN * (i - SECTION_LEN * (i / SECTION_LEN));
+
+            hideDigitsInThisSection(digitsPtr, amountOfHiddenDigits, startIndexOfSectionRow,
+                                    startIndexOfSectionCol);
+      }
+}
+
+void hideDigitsInThisSection(int ***digitPtr, int amountOfHiddenDigits, const int startRow,
+                             const int startCol) {
+      const int SECTION_LEN = 3;
+
+      while (amountOfHiddenDigits != 0) {
+            int randomDigit = 1 + rand() % 9;
+
+            bool isFound = false;
+            while (!isFound) {
+                  randomDigit = randomDigit < 9 ? randomDigit + 1 : 1;
+
+                  for (int i = startRow; !isFound && i < startRow + SECTION_LEN; i++) {
+                        for (int j = startCol; !isFound && j < startCol + SECTION_LEN; j++) {
+                              if (*(*(*digitPtr + i) + j) == randomDigit) {
+                                    *(*(*digitPtr + i) + j) = 0;
+
+                                    isFound = true;
+
+                                    amountOfHiddenDigits--;
+                              }
+                        }
+                  }
+            }
+      }
+}
+
+void copyDigits(int ***from, int ***to, const int dimension) {
+      for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                  *(*(*to + i) + j) = *(*(*from + i) + j);
+            }
+      }
+}
+
+void clearLine(int ***digitsPtr, const int dimension, const int indexOfLine) {
+      const int DEFAULT_VALUE = 0;
+
+      for (int i = 0; i < dimension; i++) *(*(*digitsPtr + indexOfLine) + i) = DEFAULT_VALUE;
+}
+
+void refreshField(int ***currentDigits, int ***defaultDigits, const int dimension, int *playerPosY,
+                  int *playerPosX, int *digitsShownCount) {
+      copyDigits(defaultDigits, currentDigits, dimension);
+
+      refreshCurrentData(defaultDigits, dimension, playerPosY, playerPosX, digitsShownCount);
+}
+
+void refreshCurrentData(int ***defaultDigits, const int dimension, int *playerPosY, int *playerPosX,
+                        int *digitsShownCount) {
+      const int MIDDLE = 4;
+
+      *playerPosX = *playerPosY = MIDDLE;
+
+      *digitsShownCount = getCountOfShownDigits(defaultDigits, dimension);
+}
+
+void recreateDigits(int ***currentDigits, int ***defaultDigits, int ***solvedMtrx, const int dimension,
+                    int *playerPosY, int *playerPosX, int *digitsShownCount) {
+      for (int i = 0; i < dimension; i++) clearLine(solvedMtrx, dimension, i);
+
+      initDigits(defaultDigits, solvedMtrx, currentDigits, dimension);
+
+      refreshCurrentData(defaultDigits, dimension, playerPosY, playerPosX, digitsShownCount);
+}
+
+void clearSell(int ***currentDigits, int ***defaultDigits, const int row, const int col, const int dimension,
                int *digitsShownCount) {
-      if (!isDefaultDigit(*currentDigits, *defaultDigits, row, col)) {
+      if (!isDefaultDigit(currentDigits, defaultDigits, row, col)) {
             bool isHiddenSell = *(*(*currentDigits + row) + col) == 0 ? true : false;
 
-            if (isCorrectInputedDigit(*currentDigits, dimension, row, col) && !isHiddenSell)
+            if (isEnteredDigitCorrect(currentDigits, dimension, row, col) && !isHiddenSell)
                   (*digitsShownCount)--;
 
             *(*(*currentDigits + row) + col) = 0;
       }
 }
 
-void showEndOfGame(int filledSellsCount) {
-      setColor(Color::GreenFg, Color::Default, "Congratulations!");
-      setColor(Color::Default, Color::Default, " You have completed ");
-      setColor(Color::CyanFg, Color::Default, "Sudoku");
-      setColor(Color::Default, Color::Default, " and filled ");
-      setColor(Color::MagentaFg, Color::Default, filledSellsCount);
-      setColor(Color::Default, Color::Default, " empty cells!");
+void changeSell(int ***currentDigits, int ***defaultDigits, const int row, const int col, const int dimension,
+                const char playerInput, int *digitsShownCount) {
+      if (!isDefaultDigit(currentDigits, defaultDigits, row, col)) {
+            bool isHiddenSell = *(*(*currentDigits + row) + col) == 0 ? true : false;
+
+            bool isPreviousDigitCorrect =
+                isEnteredDigitCorrect(currentDigits, dimension, row, col) && !isHiddenSell;
+
+            *(*(*currentDigits + row) + col) = playerInput - '0';
+
+            bool isCurrentDigitCorrect = isEnteredDigitCorrect(currentDigits, dimension, row, col);
+
+            if (isCurrentDigitCorrect && !isPreviousDigitCorrect)
+                  (*digitsShownCount)++;
+            else if (isPreviousDigitCorrect && !isCurrentDigitCorrect)
+                  (*digitsShownCount)--;
+      }
 }
 
-void showHint(int ***solvedMtrx, int ***defaultDigits, int dimension) {
-      clear();
-      drawField(*solvedMtrx, *defaultDigits, dimension, -1, -1);
-      setColor(Color::BlackFg, Color::Default, "Press Enter to hide the hint.");
-      getchar();
-      getchar();
+template <typename T>
+void setColor(const int fgColor, const int bgColor, const T text) {
+      std::cout << "\033[" << bgColor << ";" << fgColor << "m" << text << "\033[" << Color::Default << "m";
 }
 
-void showMenu(int digitsShownCount) {
+void clear() { std::cout << "\x1B[2J\x1B[H"; }
+
+void showRules() {
+      using std::cout, std::endl;
+
+      cout << "Rules of the game \"Sudoku\":" << endl;
+
+      cout << "------------------------------" << endl;
+
+      cout << "- Sudoku is played over a 9x9 grid, divided \nto 3x3 sub grids called \"regions\";" << endl;
+      cout << "- Sudoku begins with some of the grid cells \nalready filled with numbers;" << endl;
+      cout << "- The object of Sudoku is to fill the other \nempty cells with numbers between 1 and 9 \n"
+              "according the following guidelines:"
+           << endl;
+
+      cout << "1. Number can appear only once on each row;" << endl;
+      cout << "2. Number can appear only once on each column;" << endl;
+      cout << "3. Number can appear only once on each region;\n" << endl;
+
+      cout << "Note: you can't change the ";
+      setColor(Color::YellowFg, Color::Default, "generated");
+      cout << " digit;" << endl;
+
+      cout << "------------------------------\n" << endl;
+}
+
+void showMenu(const int digitsShownCount) {
       using std::cout, std::endl;
 
       cout << "\nm - show menu;" << endl;
@@ -372,122 +437,76 @@ void showMenu(int digitsShownCount) {
       cout << " - correct digit;" << endl;
 }
 
-void showRules() {
-      using std::cout, std::endl;
-
-      cout << "Rules of the game \"Sudoku\":" << endl;
-
-      cout << "------------------------------" << endl;
-
-      cout << "- Sudoku is played over a 9x9 grid, divided \nto 3x3 sub grids called \"regions\";" << endl;
-      cout << "- Sudoku begins with some of the grid cells \nalready filled with numbers;" << endl;
-      cout << "- The object of Sudoku is to fill the other \nempty cells with numbers between 1 and 9 \n"
-              "according the following guidelines:"
-           << endl;
-
-      cout << "1. Number can appear only once on each row;" << endl;
-      cout << "2. Number can appear only once on each column;" << endl;
-      cout << "3. Number can appear only once on each region;\n" << endl;
-
-      cout << "Note: you can't change the ";
-      setColor(Color::YellowFg, Color::Default, "generated");
-      cout << " digit;" << endl;
-
-      cout << "------------------------------\n" << endl;
+void showHint(int ***solvedMtrx, int ***defaultDigits, const int dimension) {
+      clear();
+      drawField(solvedMtrx, defaultDigits, dimension, -1, -1);
+      setColor(Color::BlackFg, Color::Default, "Press Enter to hide the hint.");
+      getchar();
+      getchar();
 }
 
-void recreateDigits(int ***currentDigits, int ***defaultDigits, int ***solvedMtrx, int dimension,
-                    int *playerPosX, int *playerPosY, int *digitsShownCount) {
-      for (int i = 0; i < dimension; i++) {
-            wipeOfLine(solvedMtrx, dimension, i);
-
-            initDigits(defaultDigits, solvedMtrx, currentDigits, dimension);
-
-            refreshCurrentData(*defaultDigits, dimension, playerPosX, playerPosY, digitsShownCount);
-      }
+void showEndOfGame(const int filledSellsCount) {
+      setColor(Color::GreenFg, Color::Default, "Congratulations!");
+      setColor(Color::Default, Color::Default, " You have completed ");
+      setColor(Color::CyanFg, Color::Default, "Sudoku");
+      setColor(Color::Default, Color::Default, " and filled ");
+      setColor(Color::MagentaFg, Color::Default, filledSellsCount);
+      setColor(Color::Default, Color::Default, " empty cells!");
 }
 
-void refreshField(int ***currentDigits, int **defaultDigits, int dimension, int *playerPosX, int *playerPosY,
-                  int *digitsShownCount) {
-      copyMtrx(defaultDigits, currentDigits, dimension);
+int **mtrxAllocate(const int dimension) {
+      int **ptr = new int *[dimension];
 
-      refreshCurrentData(defaultDigits, dimension, playerPosX, playerPosY, digitsShownCount);
+      for (int i = 0; i < dimension; i++) *(ptr + i) = new int[dimension];
+
+      return ptr;
 }
 
-void refreshCurrentData(int **defaultDigits, int dimension, int *playerPosX, int *playerPosY,
-                        int *digitsShownCount) {
-      const int MIDDLE = 4;
-
-      *playerPosX = *playerPosY = MIDDLE;
-
-      *digitsShownCount = getCountOfShownNumbers(defaultDigits, dimension);
+void freeMtrxs(int ***defaultDigits, int ***currentDigits, int ***solvedMtrx, const int dimension) {
+      freeMtrx(defaultDigits, dimension);
+      freeMtrx(currentDigits, dimension);
+      freeMtrx(solvedMtrx, dimension);
 }
 
-bool isDefaultDigit(int **currentDigits, int **defaultDigits, int row, int col) {
-      return (*(*(currentDigits + row) + col) == *(*(defaultDigits + row) + col)) &&
-             (*(*(defaultDigits + row) + col) != 0);
+void freeMtrx(int ***mtrxPtr, const int dimension) {
+      for (int i = 0; i < dimension; i++) delete[] * (*mtrxPtr + i);
+
+      delete[](*mtrxPtr);
 }
 
-void initDigits(int ***defaultDigitsPtr, int ***solvedDigitsPtr, int ***currentDigitsPtr, int dimension) {
-      fillMtrxOfRandomDigitsFully(solvedDigitsPtr, dimension);
+Color getFgColor(int ***digits, int ***defaultDigits, const int dimension, const int row, const int col,
+                 const int playerPosX, const int playerPosY) {
+      const int HIDDEN_DIGIT = 0;
 
-      copyMtrx(*solvedDigitsPtr, defaultDigitsPtr, dimension);
+      Color result;
 
-      hideAnyRandomDigits(defaultDigitsPtr);
+      bool isDefaultDigit = *(*(*defaultDigits + row) + col) == *(*(*digits + row) + col);
+      bool isShownDigit = (*(*(*digits + row) + col)) != HIDDEN_DIGIT;
 
-      copyMtrx(*defaultDigitsPtr, currentDigitsPtr, dimension);
+      if (row == playerPosY && col == playerPosX)
+            result = Color::CyanFg;
+      else if (!isEnteredDigitCorrect(digits, dimension, row, col) && !isDefaultDigit && isShownDigit)
+            result = Color::RedFg;
+      else if (isDefaultDigit && isShownDigit)
+            result = Color::YellowFg;
+      else if (!isDefaultDigit)
+            result = Color::GreenFg;
+      else
+            result = Color::BlackFg;
+
+      return result;
 }
 
-void copyMtrx(int **from, int ***to, int dimension) {
-      for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                  *(*(*to + i) + j) = *(*(from + i) + j);
-            }
-      }
-}
-
-void fillMtrxOfRandomDigitsFully(int ***mtrxPtr, int dimension) {
-      int wipedLinesCount = 0;
-      int iFirstInWipedLine = 0;
-
-      for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                  int result = getRandomUnusedDigit(mtrxPtr, dimension, i, j);
-
-                  if (result != -1) {
-                        *(*(*mtrxPtr + i) + j) = result;
-                  } else {
-                        wipeOfLine(mtrxPtr, dimension, i);
-
-                        if (++wipedLinesCount > 1 && iFirstInWipedLine == i) {
-                              for (int k = 0; k <= i; k++) {
-                                    wipeOfLine(mtrxPtr, dimension, k);
-                              }
-
-                              i = 0;
-                              j = -1;
-
-                              wipedLinesCount = 0;
-                        }
-
-                        j = -1;
-
-                        iFirstInWipedLine = i;
-                  }
-            }
-      }
-}
-
-int getRandomUnusedDigit(int ***mtrxPtr, int dimension, int verticalIndex, int horizontalIndex) {
+int getRandomUnusedDigit(int ***mtrxPtr, const int dimension, const int row, const int col) {
       int randomDigit = 1 + rand() % 9;
-      int firstDigit = randomDigit;
+      int initialDigit = randomDigit;
 
-      while (hasDigitInVerticalLine(*mtrxPtr, dimension, verticalIndex, horizontalIndex, randomDigit) ||
-             hasDigitInHorizontalLine(*mtrxPtr, dimension, verticalIndex, horizontalIndex, randomDigit) ||
-             hasDigitInCurrentSection(*mtrxPtr, randomDigit, horizontalIndex, verticalIndex)) {
+      while (hasDigitInVerticalLine(mtrxPtr, dimension, row, col, randomDigit) ||
+             hasDigitInHorizontalLine(mtrxPtr, dimension, row, col, randomDigit) ||
+             hasDigitInCurrentSection(mtrxPtr, randomDigit, row, col)) {
             randomDigit = randomDigit < 9 ? randomDigit + 1 : 1;
 
-            if (firstDigit == randomDigit) {
+            if (initialDigit == randomDigit) {
                   randomDigit = -1;
 
                   break;
@@ -497,90 +516,68 @@ int getRandomUnusedDigit(int ***mtrxPtr, int dimension, int verticalIndex, int h
       return randomDigit;
 }
 
-bool hasDigitInHorizontalLine(int **mtrx, int dimension, int verticalIndex, int horizontalIndex, int digit) {
+int getCountOfShownDigits(int ***defaultDigits, const int dimension) {
+      int result = 0;
+      const int HIDDEN_DIGIT = 0;
+
+      for (int i = 0; i < dimension; i++)
+            for (int j = 0; j < dimension; j++)
+                  result = *(*(*defaultDigits + i) + j) != HIDDEN_DIGIT ? result + 1 : result;
+
+      return result;
+}
+
+bool hasDigitInHorizontalLine(int ***mtrx, const int dimension, const int row, const int col,
+                              const int digit) {
       bool has = false;
 
       for (int i = 0; !has && i < dimension; i++) {
-            if (i == horizontalIndex) continue;
+            if (i == col) continue;
 
-            if (*(*(mtrx + verticalIndex) + i) == digit) has = true;
+            if (*(*(*mtrx + row) + i) == digit) has = true;
       }
 
       return has;
 }
 
-bool hasDigitInVerticalLine(int **mtrx, int dimension, int verticalIndex, int horizontalIndex, int digit) {
+bool hasDigitInVerticalLine(int ***mtrx, const int dimension, const int row, const int col, const int digit) {
       bool has = false;
 
       for (int i = 0; !has && i < dimension; i++) {
-            if (i == verticalIndex) continue;
+            if (i == row) continue;
 
-            if (*(*(mtrx + i) + horizontalIndex) == digit) has = true;
+            if (*(*(*mtrx + i) + col) == digit) has = true;
       }
 
       return has;
 }
 
-bool hasDigitInCurrentSection(int **mtrx, int digit, int horizontalIndex, int verticalIndex) {
+bool hasDigitInCurrentSection(int ***mtrx, const int digit, const int row, const int col) {
       const int SECTION_LEN = 3;
 
       bool has = false;
 
-      for (int i = SECTION_LEN * (verticalIndex / SECTION_LEN);
-           !has && i < SECTION_LEN + SECTION_LEN * (verticalIndex / SECTION_LEN); i++) {
-            for (int j = SECTION_LEN * (horizontalIndex / SECTION_LEN);
-                 !has && j < SECTION_LEN + SECTION_LEN * (horizontalIndex / SECTION_LEN); j++) {
-                  if (i == verticalIndex && j == horizontalIndex) continue;
+      int startIndexOfSectionRow = SECTION_LEN * (row / SECTION_LEN);
+      int startIndexOfSectionCol = SECTION_LEN * (col / SECTION_LEN);
 
-                  if (*(*(mtrx + i) + j) == digit) has = true;
+      for (int i = startIndexOfSectionRow; !has && i < SECTION_LEN + startIndexOfSectionRow; i++) {
+            for (int j = startIndexOfSectionCol; !has && j < SECTION_LEN + startIndexOfSectionCol; j++) {
+                  if (i == row && j == col) continue;
+
+                  if (*(*(*mtrx + i) + j) == digit) has = true;
             }
       }
 
       return has;
 }
 
-void wipeOfLine(int ***digitsPtr, int dimension, int indexOfLine) {
-      const int DEFAULT_VALUE = 0;
-
-      for (int i = 0; i < dimension; i++) {
-            *(*(*digitsPtr + indexOfLine) + i) = DEFAULT_VALUE;
-      }
+bool isDefaultDigit(int ***currentDigits, int ***defaultDigits, const int row, const int col) {
+      return (*(*(*currentDigits + row) + col) == *(*(*defaultDigits + row) + col)) &&
+             (*(*(*defaultDigits + row) + col) != 0);
 }
 
-void hideAnyRandomDigits(int ***digitsPtr) {
-      const int LEFT_GROUND = 5, RIGHT_GROUND = 7;
-      const int SECTIONS_COUNT = 9;
-      const int SECTION_LEN = 3;
-
-      for (int i = 0; i < SECTIONS_COUNT; i++) {
-            int amountOfHiddenDigits = LEFT_GROUND + rand() % (RIGHT_GROUND - LEFT_GROUND + 1);
-
-            hideDigitsInThisSection(digitsPtr, amountOfHiddenDigits, SECTION_LEN * (i / SECTION_LEN),
-                                    SECTION_LEN * (i - SECTION_LEN * (i / SECTION_LEN)));
-      }
-}
-
-void hideDigitsInThisSection(int ***digitPtr, int amountOfHiddenDigits, int startRow, int startCol) {
-      const int SECTION_LEN = 3;
-
-      while (amountOfHiddenDigits != 0) {
-            int randomDigit = 1 + rand() % 9;
-
-            bool is_found = false;
-            while (!is_found) {
-                  randomDigit = randomDigit < 9 ? randomDigit + 1 : 1;
-
-                  for (int i = startRow; !is_found && i < startRow + SECTION_LEN; i++) {
-                        for (int j = startCol; !is_found && j < startCol + SECTION_LEN; j++) {
-                              if (*(*(*digitPtr + i) + j) == randomDigit) {
-                                    *(*(*digitPtr + i) + j) = 0;
-
-                                    is_found = true;
-
-                                    amountOfHiddenDigits--;
-                              }
-                        }
-                  }
-            }
-      }
+bool isEnteredDigitCorrect(int ***digits, const int dimension, const int row, const int col) {
+      return !((hasDigitInHorizontalLine(digits, dimension, row, col, *(*(*digits + row) + col)) ||
+                hasDigitInVerticalLine(digits, dimension, row, col, *(*(*digits + row) + col))) ||
+               hasDigitInCurrentSection(digits, *(*(*digits + row) + col), row, col));
 }
