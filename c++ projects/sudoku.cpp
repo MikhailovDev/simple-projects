@@ -1,6 +1,7 @@
 // sudoku.cpp - simple console game
 #include <iostream>
 #include <random>
+#include <vector>
 
 enum Color {
       BlackFg = 90,
@@ -56,9 +57,8 @@ void showMenu(const int digitsShownCount);
 void showHint(int ***solvedMtrx, int ***defaultDigits, const int dimension);
 void showEndOfGame(const int filledSellsCount);
 
-int **mtrxAllocate(const int dimension);
-void freeMtrxs(int ***defaultDigits, int ***currentDigits, int ***solvedMtrx, const int dimension);
-void freeMtrx(int ***mtrxPtr, const int dimension);
+void allocateMtrxs(const int dimension, std::vector<int ***> mtrxPtrs);
+void freeMtrxs(const int dimension, std::vector<int ***> mtrxPtrs);
 
 Color getFgColor(int ***digits, int ***defaultDigits, const int dimension, const int row, const int col,
                  const int playerPosX, const int playerPosY);
@@ -86,16 +86,14 @@ int main() {
       return 0;
 }
 
-// Allocate and free digits using one parameter for each of mtrxs.
 void game() {
       const int DIMENSION = 9;
       const int END_COUNT = 81;
       const int MIDDLE = 4;
       const char ESC = '\x1B';
 
-      int **defaultDigits = mtrxAllocate(DIMENSION);
-      int **currentDigits = mtrxAllocate(DIMENSION);
-      int **solvedMtrx = mtrxAllocate(DIMENSION);
+      int **defaultDigits = nullptr, **currentDigits = nullptr, **solvedMtrx = nullptr;
+      allocateMtrxs(DIMENSION, {&defaultDigits, &currentDigits, &solvedMtrx});
       initDigits(&defaultDigits, &solvedMtrx, &currentDigits, DIMENSION);
 
       int playerPosX = MIDDLE, playerPosY = MIDDLE;
@@ -123,7 +121,7 @@ void game() {
 
       if (digitsShownCount == END_COUNT) showEndOfGame(END_COUNT - initialDigitsShownCount);
 
-      freeMtrxs(&defaultDigits, &currentDigits, &solvedMtrx, DIMENSION);
+      freeMtrxs(DIMENSION, {&defaultDigits, &currentDigits, &solvedMtrx});
 }
 
 void initDigits(int ***defaultDigitsPtr, int ***solvedDigitsPtr, int ***currentDigitsPtr,
@@ -454,24 +452,20 @@ void showEndOfGame(const int filledSellsCount) {
       setColor(Color::Default, Color::Default, " empty cells!");
 }
 
-int **mtrxAllocate(const int dimension) {
-      int **ptr = new int *[dimension];
+void allocateMtrxs(const int dimension, std::vector<int ***> mtrxPtrs) {
+      for (auto mtrxPtr : mtrxPtrs) {
+            (*mtrxPtr) = new int *[dimension];
 
-      for (int i = 0; i < dimension; i++) *(ptr + i) = new int[dimension];
-
-      return ptr;
+            for (int i = 0; i < dimension; i++) *(*mtrxPtr + i) = new int[dimension];
+      }
 }
 
-void freeMtrxs(int ***defaultDigits, int ***currentDigits, int ***solvedMtrx, const int dimension) {
-      freeMtrx(defaultDigits, dimension);
-      freeMtrx(currentDigits, dimension);
-      freeMtrx(solvedMtrx, dimension);
-}
+void freeMtrxs(const int dimension, std::vector<int ***> mtrxPtrs) {
+      for (auto mtrxPtr : mtrxPtrs) {
+            for (int i = 0; i < dimension; i++) delete[] * (*mtrxPtr + i);
 
-void freeMtrx(int ***mtrxPtr, const int dimension) {
-      for (int i = 0; i < dimension; i++) delete[] * (*mtrxPtr + i);
-
-      delete[](*mtrxPtr);
+            delete[](*mtrxPtr);
+      }
 }
 
 Color getFgColor(int ***digits, int ***defaultDigits, const int dimension, const int row, const int col,
